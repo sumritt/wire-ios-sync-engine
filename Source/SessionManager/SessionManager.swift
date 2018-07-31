@@ -762,8 +762,9 @@ extension SessionManager: UnauthenticatedSessionDelegate {
             if let profileImageData = session.authenticationStatus.profileImageData {
                 self.updateProfileImage(imageData: profileImageData)
             }
-            
-            let registered = session.authenticationStatus.completedRegistration || session.registrationStatus.completedRegistration
+
+            let usesCompanyLogin = session.authenticationStatus.usesCompanyLogin
+            let registered = !usesCompanyLogin && (session.authenticationStatus.completedRegistration || session.registrationStatus.completedRegistration)
             let emailCredentials = session.authenticationStatus.emailCredentials()
             
             userSession.syncManagedObjectContext.performGroupedBlock {

@@ -75,6 +75,8 @@ typedef NS_ENUM(NSUInteger, ZMAuthenticationPhase) {
 
 @property (nonatomic) NSData *authenticationCookieData;
 
+@property (nonatomic) BOOL usesCompanyLogin;
+
 - (instancetype)initWithGroupQueue:(id<ZMSGroupQueue>)groupQueue userInfoParser:(id<UserInfoParser>)userInfoParser;
 
 - (id)addAuthenticationCenterObserver:(id<ZMAuthenticationStatusObserver>)observer;

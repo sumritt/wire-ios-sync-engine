@@ -127,7 +127,9 @@ extension URLAction {
     func execute(in unauthenticatedSession: UnauthenticatedSession) {
         switch self {
         case .companyLoginSuccess(let userInfo):
+            unauthenticatedSession.authenticationStatus.usesCompanyLogin = true
             unauthenticatedSession.authenticationStatus.loginSucceeded(with: userInfo)
+
         case .companyLoginFailure:
             break // no-op (error should be handled in UI)
 
