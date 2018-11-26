@@ -728,16 +728,26 @@
     NSUUID *nonce = NSUUID.createUUID;
     NSUUID *thumbnailAssetID = NSUUID.createUUID;
     NSString *thumbnailIDString = thumbnailAssetID.transportString;
+    NSUUID *videoAssetID = NSUUID.createUUID;
+    NSString *videoIDString = videoAssetID.transportString;
     NSData *otrKey = NSData.randomEncryptionKey;
+    NSData *videoOtrKey = NSData.randomEncryptionKey;
     NSData *encryptedAsset = [self.mediumJPEGData zmEncryptPrefixingPlainTextIVWithKey:otrKey];
+    NSData *encryptedVideo = [[NSData secureRandomDataOfLength:512] zmEncryptPrefixingIVWithKey:videoOtrKey];
     NSData *sha256 = encryptedAsset.zmSHA256Digest;
+    NSData *videoSha256 = encryptedVideo.zmSHA256Digest;
 
     ZMAssetRemoteData *remote = [ZMAssetRemoteData remoteDataWithOTRKey:otrKey sha256:sha256 assetId:thumbnailIDString assetToken:nil];
+    ZMAssetRemoteData *remoteVideo = [ZMAssetRemoteData remoteDataWithOTRKey:videoOtrKey sha256:videoSha256 assetId:videoIDString assetToken:nil];
     ZMAssetImageMetaData *image = [ZMAssetImageMetaData imageMetaDataWithWidth:1024 height:2048];
     ZMAssetPreview *preview = [ZMAssetPreview previewWithSize:256 mimeType:@"image/jpeg" remoteData:remote imageMetaData:image];
-    ZMAsset *asset = [ZMAsset assetWithOriginal:nil preview:preview];
-    ZMGenericMessage *updateMessage = [ZMGenericMessage messageWithContent:asset nonce:nonce];
 
+    ZMAssetBuilder *builder = [[ZMAssetBuilder alloc] init];
+    [builder setUploaded:remoteVideo];
+    [builder setPreview:preview];
+
+    ZMAsset *asset = [builder build];
+    ZMGenericMessage *updateMessage = [ZMGenericMessage messageWithContent:asset nonce:nonce];
 
     // when
     __block MessageChangeObserver *observer;
