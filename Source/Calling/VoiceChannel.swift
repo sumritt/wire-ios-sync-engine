@@ -65,11 +65,11 @@ public protocol CallProperties : NSObjectProtocol {
 @objc
 public protocol CallActions : NSObjectProtocol {
     
-    func mute(_ muted: Bool, userSession: ZMUserSession)
-    func join(video: Bool, userSession: ZMUserSession) -> Bool
-    func leave(userSession: ZMUserSession)
-    func continueByDecreasingConversationSecurity(userSession: ZMUserSession)
-    func leaveAndKeepDegradedConversationSecurity(userSession: ZMUserSession)
+    func mute(_ muted: Bool)
+    func join(video: Bool) -> Bool
+    func leave()
+    func continueByDecreasingConversationSecurity()
+    func leaveAndKeepDegradedConversationSecurity()
 }
 
 @objc

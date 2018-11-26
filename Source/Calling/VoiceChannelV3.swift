@@ -129,10 +129,10 @@ public class VoiceChannelV3 : NSObject, VoiceChannel {
     }
     
 }
-
+/*ß
 extension VoiceChannelV3 : CallActions {
     
-    public func mute(_ muted: Bool, userSession: ZMUserSession) {
+    public func mute(_ muted: Bool) {
         if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
             userSession.callKitDelegate?.requestMuteCall(in: conversation!, muted: muted)
         } else {
@@ -140,12 +140,12 @@ extension VoiceChannelV3 : CallActions {
         }
     }
     
-    public func continueByDecreasingConversationSecurity(userSession: ZMUserSession) {
+    public func continueByDecreasingConversationSecurity() {
         guard let conversation = conversation else { return }
         conversation.makeNotSecure()
     }
     
-    public func leaveAndKeepDegradedConversationSecurity(userSession: ZMUserSession) {
+    public func leaveAndKeepDegradedConversationSecurity() {
         guard let conversation = conversation else { return }
         userSession.syncManagedObjectContext.performGroupedBlock {
             let conversationId = conversation.objectID
@@ -153,62 +153,50 @@ extension VoiceChannelV3 : CallActions {
                 userSession.callingStrategy.dropPendingCallMessages(for: syncConversation)
             }
         }
-        leave(userSession: userSession)
+        leave()
     }
     
-    public func join(video: Bool, userSession: ZMUserSession) -> Bool {
+    public func join(video: Bool) -> Bool {
         if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
             userSession.callKitDelegate?.requestJoinCall(in: conversation!, video: video)
             return true
         } else {
-            return join(video: video)
-        }
-    }
-    
-    public func leave(userSession: ZMUserSession) {
-        if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
-            userSession.callKitDelegate?.requestEndCall(in: conversation!)
-        } else {
-            return leave()
-        }
-    }
-    
-}
-
-extension VoiceChannelV3 : CallActionsInternal {
-    
-    public func join(video: Bool) -> Bool {
-        guard let conversation = conversation else { return false }
-        
-        var joined = false
-        
-        switch state {
-        case .incoming(video: _, shouldRing: _, degraded: let degraded):
-            if !degraded {
-                joined = callCenter?.answerCall(conversation: conversation, video: video) ?? false
+            guard let conversation = conversation else { return false }
+            
+            var joined = false
+            
+            switch state {
+            case .incoming(video: _, shouldRing: _, degraded: let degraded):
+                if !degraded {
+                    joined = callCenter?.answerCall(conversation: conversation, video: video) ?? false
+                }
+            default:
+                joined = self.callCenter?.startCall(conversation: conversation, video: video) ?? false
             }
-        default:
-            joined = self.callCenter?.startCall(conversation: conversation, video: video) ?? false
+            
+            return joined
         }
-        
-        return joined
     }
     
     public func leave() {
-        guard let conv = conversation,
-              let remoteID = conv.remoteIdentifier
-        else { return }
-        
-        switch state {
-        case .incoming:
-            callCenter?.rejectCall(conversationId: remoteID)
-        default:
-            callCenter?.closeCall(conversationId: remoteID)
+        if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
+            userSession.callKitDelegate?.requestEndCall(in: conversation!)
+        } else {
+            guard let conv = conversation,
+                let remoteID = conv.remoteIdentifier
+                else { return }
+            
+            switch state {
+            case .incoming:
+                callCenter?.rejectCall(conversationId: remoteID)
+            default:
+                callCenter?.closeCall(conversationId: remoteID)
+            }
         }
     }
     
 }
-
+*/
 extension VoiceChannelV3 : CallObservers {
 
     public func addNetworkQualityObserver(_ observer: NetworkQualityObserver) -> Any {

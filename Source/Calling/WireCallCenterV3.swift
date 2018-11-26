@@ -576,3 +576,72 @@ extension WireCallCenterV3 {
     }
 
 }
+
+
+extension WireCallCenterV3 : CallActions {
+    
+    public func mute(_ muted: Bool) {
+        if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
+            userSession.callKitDelegate?.requestMuteCall(in: conversation!, muted: muted)
+        } else {
+            userSession.mediaManager.isMicrophoneMuted = muted
+        }
+    }
+    
+    public func continueByDecreasingConversationSecurity() {
+        guard let conversation = conversation else { return }
+        conversation.makeNotSecure()
+    }
+    
+    public func leaveAndKeepDegradedConversationSecurity() {
+        guard let conversation = conversation else { return }
+        userSession.syncManagedObjectContext.performGroupedBlock {
+            let conversationId = conversation.objectID
+            if let syncConversation = (try? userSession.syncManagedObjectContext.existingObject(with: conversationId)) as? ZMConversation {
+                userSession.callingStrategy.dropPendingCallMessages(for: syncConversation)
+            }
+        }
+        leave()
+    }
+    
+    public func join(video: Bool) -> Bool {
+        if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
+            userSession.callKitDelegate?.requestJoinCall(in: conversation!, video: video)
+            return true
+        } else {
+            guard let conversation = conversation else { return false }
+            
+            var joined = false
+            
+            switch state {
+            case .incoming(video: _, shouldRing: _, degraded: let degraded):
+                if !degraded {
+                    joined = callCenter?.answerCall(conversation: conversation, video: video) ?? false
+                }
+            default:
+                joined = self.callCenter?.startCall(conversation: conversation, video: video) ?? false
+            }
+            
+            return joined
+        }
+    }
+    
+    public func leave() {
+        if userSession.callNotificationStyle == .callKit, #available(iOS 10.0, *) {
+            userSession.callKitDelegate?.requestEndCall(in: conversation!)
+        } else {
+            guard let conv = conversation,
+                let remoteID = conv.remoteIdentifier
+                else { return }
+            
+            switch state {
+            case .incoming:
+                callCenter?.rejectCall(conversationId: remoteID)
+            default:
+                callCenter?.closeCall(conversationId: remoteID)
+            }
+        }
+    }
+    
+}
+

@@ -29,7 +29,7 @@ public final class CallStateObserver : NSObject {
     fileprivate weak var userSession: ZMUserSession?
     fileprivate let localNotificationDispatcher : LocalNotificationDispatcher
     fileprivate let syncManagedObjectContext : NSManagedObjectContext
-    fileprivate var callStateToken : Any? = nil
+    //fileprivate var callStateToken : Any? = nil
     fileprivate var missedCalltoken : Any? = nil
     fileprivate let systemMessageGenerator = CallSystemMessageGenerator()
     
@@ -40,7 +40,7 @@ public final class CallStateObserver : NSObject {
         
         super.init()
         
-        self.callStateToken = WireCallCenterV3.addCallStateObserver(observer: self, context: userSession.managedObjectContext)
+        //self.callStateToken = WireCallCenterV3.addCallStateObserver(observer: self, context: userSession.managedObjectContext)
         self.missedCalltoken = WireCallCenterV3.addMissedCallObserver(observer: self, context: userSession.managedObjectContext)
     }
     

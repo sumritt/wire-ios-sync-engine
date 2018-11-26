@@ -49,7 +49,7 @@ private let zmLog = ZMSLog(tag: "Push")
         guard let callState = conversation.voiceChannel?.state else { return }
         
         if case let .incoming(video: video, shouldRing: _, degraded: _) = callState, callCenter?.activeCallConversations(in: self).count == 0 {
-            _ = conversation.voiceChannel?.join(video: video, userSession: self)
+            _ = conversation.voiceChannel?.join(video: video)
         }
     }
     
@@ -82,7 +82,7 @@ private let zmLog = ZMSLog(tag: "Push")
         let conversation = userInfo.conversation(in: managedObjectContext)
         
         managedObjectContext.perform { 
-            conversation?.voiceChannel?.leave(userSession: self)
+            conversation?.voiceChannel?.leave()
             activity?.end()
             completionHandler()
         }
