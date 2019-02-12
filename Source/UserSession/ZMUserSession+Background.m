@@ -59,11 +59,9 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))comp
     }];
 }
 
-- (void)application:(id<ZMApplication>)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)(void))completionHandler;
+- (void)application:(__unused id<ZMApplication>)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)(void))completionHandler;
 {
-    NOT_USED(application);
-    NOT_USED(identifier);
-    completionHandler();
+    [self.transportSession addCompletionHandlerForBackgroundSessionWithIdentifier:identifier handler:completionHandler];
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)note;
