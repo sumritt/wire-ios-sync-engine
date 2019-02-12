@@ -239,7 +239,9 @@ ZM_EMPTY_ASSERTING_INIT()
         
         self.userExpirationObserver = [[UserExpirationObserver alloc] initWithManagedObjectContext:self.managedObjectContext];
         [self startEphemeralTimers];
-        
+        session.workQueue.suspended = NO;
+        ZMLogWithLevelAndTag(ZMLogLevelDebug, ZMTAG_NETWORK, @"Unsuspended session work queue");
+
         [ZMRequestAvailableNotification notifyNewRequestsAvailable:self];
     }
     return self;
